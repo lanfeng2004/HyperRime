@@ -1,0 +1,18 @@
+customization:
+  distribution_code_name: Weasel
+  distribution_version: 0.17.4
+  generator: "Weasel::UIStyleSettings"
+  modified_time: "Thu Aug 20 11:06:00 2026"
+  rime_version: 1.13.1
+patch:
+  "style/color_scheme": lost_temple
+  "style/horizontal": true
+  "style/candidate_list_layout": linear
+  "style/font_face": "Microsoft YaHei"
+  "style/font_point": 14
+  "style/label_font_face": "Consolas"
+  "style/label_font_point": 12
+  "style/inline_preedit": true
+  "style/corner_radius": 8
+  "style/spacing": 10
+  "style/line_spacing": 5

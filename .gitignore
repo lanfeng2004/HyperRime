@@ -1,0 +1,22 @@
+# ===== 本地辅助工具与缓存 =====
+.workbuddy/
+
+# ===== Rime 编译产物与用户数据 =====
+build/
+*.userdb/
+*.userdb
+installation.yaml
+user.yaml
+
+# ===== 归档目录（历史遗留文件，不参与版本管理） =====
+_archive/
+
+# ===== 大模型文件（体积过大，请从上游 Releases 单独下载） =====
+*.gram
+
+# ===== 临时与系统文件 =====
+*.tmp
+*.bak
+*~
+.DS_Store
+Thumbs.db

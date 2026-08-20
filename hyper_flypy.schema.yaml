@@ -1,0 +1,342 @@
+# Rime schema
+# encoding: utf-8
+
+# 鹤翼双拼 - 基于小鹤双拼的定制方案
+# 鹤翼: 取小鹤之"鹤"，hyper之"翼"，寓意鹤翼双拼如鹤展翼
+
+schema:
+  schema_id: hyper_flypy
+  name: "鹤翼双拼"
+  version: "1.0.0"
+  author:
+    - HyperRime
+  description: |
+    鹤翼双拼方案，基于小鹤双拼定制。
+    特性：
+      * 小鹤双拼键位
+      * 中英混合输入
+      * 拆字/笔画反查
+      * 错音纠正
+      * 日期时间/农历/计算器
+      * 小鹤音形辅码
+  dependencies:
+    - radical_pinyin_flypy
+    - stroke
+    - melt_eng
+
+switches:
+  - name: ascii_mode
+    reset: 0
+    states: [ 中文, 英文 ]
+  - name: emoji_suggestion
+    states: [ "😣️","😁️"]
+    reset: 1
+  - name: full_shape
+    states: [ 半角, 全角 ]
+    reset: 0
+  - name: tone_display
+    states: [ 声杳, 声起 ]
+    reset: 0
+  - name: transcription
+    states: [ 简体 , 繁体 ]
+    reset: 0
+  - name: ascii_punct
+    states: [ "。，", "．，" ]
+    reset: 0
+  - name: chaifen
+    states: [ 🙈, 🐵 ]
+    reset: 0
+
+engine:
+  processors:
+    - lua_processor@*select_character
+    - lua_processor@*codeLengthLimit_processor
+    - ascii_composer
+    - recognizer
+    - key_binder
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+  segmentors:
+    - ascii_segmentor
+    - matcher
+    - affix_segmentor@radical_reverse_lookup
+    - affix_segmentor@stroke
+    - affix_segmentor@unicode
+    - abc_segmentor
+    - punct_segmentor
+    - fallback_segmentor
+  translators:
+    - punct_translator
+    - script_translator
+    - lua_translator@*unicode_translator
+    - lua_translator@*shijian
+    - lua_translator@*number_translator
+    - lua_translator@*chineseLunarCalendar_translator
+    - lua_translator@*mint_calculator_translator
+    - table_translator@melt_eng
+    - table_translator@cn_en
+    - reverse_lookup_translator@radical_reverse_lookup
+    - reverse_lookup_translator@stroke
+    - lua_translator@*force_gc
+  filters:
+    - lua_filter@*corrector_filter
+    - lua_filter@*super_preedit
+    - lua_filter@*autocap_filter
+    - simplifier@emoji_suggestion
+    - simplifier@transcription_cc
+    - simplifier@chaifen_cc
+    - lua_filter@*aux_code_filter@flypy_full
+    - lua_filter@*reduce_english_filter
+    - uniquifier
+
+date_formats:
+  - "Y年m月d日"
+  - "Y-m-d"
+  - "Y/m/d"
+  - "Y.m.d"
+  - "Ymd"
+  - "Y年n月j日"
+  - "y年n月j日"
+  - "n月j日"
+time_formats:
+  - "H:M"
+  - "H点M分"
+  - "H:M:S"
+  - "H时M分S秒"
+  - "AI:M"
+  - "I:M P"
+datetime_formats:
+  - "Y-m-d H:M:S"
+  - "Y-m-dTH:M:S O"
+  - "YmdHMS"
+  - "Y年m月d日 H点M分"
+  - "y/m/d I:M p"
+
+transcription_cc:
+  option_name: transcription
+  opencc_config: s2t.json
+  tips: none
+  excluded_types: [ reverse_lookup ]
+
+emoji_suggestion:
+  opencc_config: emoji.json
+  option_name: emoji_suggestion
+  tips: all
+  inherit_comment: false
+
+chaifen_cc:
+  opencc_config: fly_Chaifen.json
+  option_name: chaifen
+  show_in_comment: true
+  comment_format:
+    - "xform/&nbsp;/ /"
+  tags:
+    - abc
+    - storkfly
+    - reverse_lookup
+  tips: char
+
+codeLengthLimit_processor: 25
+
+aux_code:
+  trigger_word: ";"
+  show_aux_notice: "trigger"
+
+reduce_english_filter:
+  mode: all
+  idx: 2
+  words: [aid, ann,
+  bail, bait, bam, band, bans, bat, bay, bend, bent, benz, bib, bid, bien, biz, boc, bop, bos, bud, buf,
+  cab, cad, cain, cam, cans, cap, cas, cef, chad, chan, chap, chef, cher, chew, chic, chin, chip, chit, coup, cum, cunt, cur,
+  dab, dag, dal, dam, dent, dew, dial, diet, dim, din, dip, dis, dit, doug, dub, dug, dunn,
+  fab, fax, fob, fog, foul, fur,
+  gag, gail, gain, gal, gam, gaol, ged, gel, ger, guam, gus, gut,
+  hail, ham, hank, hans, hat, hay, heil, heir, hem, hep, hud, hum, hung, hunk, hut,
+  jim, jug,
+  kat,
+  lab, lad, lag, laid, lam, laos, lap, lat, lax, lay, led, leg, lex, liam, lib, lid, lied, lien, lies, linn, lip, lit, liz, lob, lua, lug, lund, lung, lux,
+  mag, maid, mann, mar, mat, med, mel, mend, mens, ment, mil, mins, mint, mob, moc, mop, mos, mot, mud, mug, mum, nail,
+  nap, nat, nay, neil, nib, nip, noun, nous, nun, nut,
+  pac, paid, pail, pain, pair, pak, pal, pam, pans, pant, pap, par, pat, paw, pax, pens, pic, pier, pies, pins, pint, pit, pix, pod, pop, pos, pot, pour, pow, pub,
+  rand, rant, rent, rep, res, ret, rex, rib, rid, rig, rim, rub, rug, rum, runc, runs,
+  sac, sail, sal, sam, sans, sap, saw, sax, sew, sham, shaw, shin, sig, sin, sip, sis, suit, sung, suns, sup, sur, sus,
+  tad, tail, taj, tar, tax, tec, ted, tel, ter, tex, tic, tied, tier, ties, tim, tin, tit, tour, tout, tum,
+  wag, wand, womens, wap, wax, weir, won,
+  yan, yen]
+
+chineseLunarCalendar_translator: lunar
+
+translator:
+  dictionary: hyper_flypy
+  prism: hyper_flypy
+  spelling_hints: 8
+  always_show_comments: true
+  comment_format: {comment}
+  preedit_format:
+    - xform/([bpmfdtnljqx])n/$1iao/
+    - xform/(\w)g/$1eng/
+    - xform/(\w)q/$1iu/
+    - xform/(\w)w/$1ei/
+    - xform/([dtnlgkhjqxyvuirzcs])r/$1uan/
+    - xform/(\w)t/$1ve/
+    - xform/(\w)y/$1un/
+    - xform/([dtnlgkhvuirzcs])o/$1uo/
+    - xform/(\w)p/$1ie/
+    - xform/([jqx])s/$1iong/
+    - xform/(\w)s/$1ong/
+    - xform/(\w)d/$1ai/
+    - xform/(\w)f/$1en/
+    - xform/(\w)h/$1ang/
+    - xform/(\w)j/$1an/
+    - xform/([gkhvuirzcs])k/$1uai/
+    - xform/(\w)k/$1ing/
+    - xform/([jqxnl])l/$1iang/
+    - xform/(\w)l/$1uang/
+    - xform/(\w)z/$1ou/
+    - xform/([gkhvuirzcs])x/$1ua/
+    - xform/(\w)x/$1ia/
+    - xform/(\w)c/$1ao/
+    - xform/([dtgkhvuirzcs])v/$1ui/
+    - xform/(\w)b/$1in/
+    - xform/(\w)m/$1ian/
+    - xform/([aoe])\1(\w)/$1$2/
+    - "xform/(^|[ '])v/$1zh/"
+    - "xform/(^|[ '])i/$1ch/"
+    - "xform/(^|[ '])u/$1sh/"
+    - xform/([jqxy])v/$1u/
+    - xform/([nl])v/$1ü/
+    - xform/ü/v/
+  initial_quality: 1.2
+  enable_user_dict: true
+
+melt_eng:
+  dictionary: melt_eng
+  enable_sentence: false
+  enable_completion: false
+  initial_quality: 0.8
+
+cn_en:
+  dictionary: ""
+  user_dict: dicts/hyper_flypy.cn_en_flypy
+  db_class: stabledb
+  enable_completion: false
+  enable_sentence: false
+  initial_quality: 0.5
+  comment_format:
+    - xform/^.+$//
+
+speller:
+  alphabet: zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA;
+  initials: zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA
+  delimiter: " `"
+  algebra:
+    - xlit/āáǎàōóǒòēéěèīíǐìūúǔùǖǘǚǜü/aaaaooooeeeeiiiiuuuuvvvvv/
+    - xform/^ng$/eng/
+    - xform/ńg|ňg|ǹg/eng/
+    - xform/ń|ň|ǹ/en/
+    - erase/^xx$/
+    - derive/^([jqxy])u$/$1v/
+    - derive/^([aoe])([ioun])$/$1$1$2/
+    - xform/^([aoe])(ng)?$/$1$1$2/
+    - xform/iu$/Ⓠ/
+    - xform/(.)ei$/$1Ⓦ/
+    - xform/uan$/Ⓡ/
+    - xform/[uv]e$/Ⓣ/
+    - xform/un$/Ⓨ/
+    - xform/^sh/Ⓤ/
+    - xform/^ch/Ⓘ/
+    - xform/^zh/Ⓥ/
+    - xform/uo$/Ⓞ/
+    - xform/ie$/Ⓟ/
+    - xform/(.)i?ong$/$1Ⓢ/
+    - xform/ing$|uai$/Ⓚ/
+    - xform/(.)ai$/$1Ⓓ/
+    - xform/(.)en$/$1Ⓕ/
+    - xform/(.)eng$/$1Ⓖ/
+    - xform/[iu]ang$/Ⓛ/
+    - xform/(.)ang$/$1Ⓗ/
+    - xform/ian$/Ⓜ/
+    - xform/(.)an$/$1Ⓙ/
+    - xform/(.)ou$/$1Ⓩ/
+    - xform/[iu]a$/Ⓧ/
+    - xform/iao$/Ⓝ/
+    - xform/(.)ao$/$1Ⓒ/
+    - xform/ui$/Ⓥ/
+    - xform/in$/Ⓑ/
+    - xlit/ⓆⓌⓇⓉⓎⓊⒾⓄⓅⓈⒹⒻⒼⒽⒿⓀⓁⓏⓍⒸⓋⒷⓃⓂ/qwrtyuiopsdfghjklzxcvbnm/
+
+stroke:
+  tag: stroke
+  dictionary: stroke
+  enable_user_dict: false
+  prefix: 'Ui'
+  tips: 〔笔画〕
+  preedit_format:
+    - xlit/hspnz/一丨丿丶乙/
+
+radical_reverse_lookup:
+  tag: radical_lookup
+  dictionary: radical_pinyin
+  prism: flypy_radical_pinyin
+  enable_completion: false
+  enable_sentence: false
+  prefix: "Uu"
+  tips: 〔拆字〕
+
+reverse_lookup:
+  tags: [stroke,radical_lookup]
+  overwrite_comment: true
+  dictionary: hyper_flypy
+
+punctuator:
+  import_preset: symbols
+  half_shape:
+      "#": "#"
+      "*": "*"
+      '.' : { commit: 。 }
+      "`": "`"
+      "~": "~"
+      "@": "@"
+      "=": "="
+      "/": ["/", "÷",]
+      '\': "、"
+      "_" : "──"
+      "'": {pair: ["「", "」"]}
+      "[": ["【", "["]
+      "]": ["】", "]"]
+      "$": ["¥", "$", "€", "£", "¢", "¤"]
+      "<": ["《", "〈", "«", "<"]
+      ">": ["》", "〉", "»", ">"]
+
+unicode:
+  tag: unicode
+  prefix: "Uc"
+  tips: 〔Unicode〕
+
+recognizer:
+  import_preset: default
+  patterns:
+    unicode: "^Uc[a-z]*'?$"
+    url: "^[a-z]+[.].+$"
+    punct: "^/([0-9]0?|[a-zA-Z]+)$"
+    stroke: "Ui[a-z]*'?$"
+    radical_lookup: "Uu[a-z]*'?$"
+    rmb: "^R[0-9]+[.]?[0-9]*"
+    expression: "^=.*$"
+    gregorian_to_lunar: "^N[0-9]{1,8}"
+    uppercase: ""
+
+key_binder:
+  import_preset: default
+  shijian_keys: ["o"]
+  bindings:
+    - {accept: "Control+Shift+E", toggle: emoji_suggestion, when: always}
+    - {accept: "Control+Shift+1", toggle: transcription, when: has_menu}
+    - {accept: "Control+Shift+exclam", toggle: transcription, when: has_menu}
+    - {accept: "Control+Shift+C", toggle: chaifen, when: has_menu}
+
+menu:
+  page_size: 9

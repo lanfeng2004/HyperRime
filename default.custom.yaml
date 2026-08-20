@@ -1,0 +1,14 @@
+customization:
+  distribution_code_name: Weasel
+  distribution_version: 0.17.4
+  generator: "Rime::SwitcherSettings"
+  modified_time: "Thu Aug 20 11:06:00 2026"
+  rime_version: 1.13.1
+patch:
+  schema_list:
+    - {schema: hyper_flypy}
+    - {schema: melt_eng}
+    - {schema: radical_pinyin_flypy}
+  "style/horizontal": true
+  "style/candidate_list_layout": linear
+  "menu/page_size": 9
